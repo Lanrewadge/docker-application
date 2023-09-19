@@ -1,11 +1,20 @@
-FROM python:3.9
+FROM python:3.6-slim
 
-WORKDIR /app
+RUN  apt-get clean && apt-get -y update
 
-COPY . .
+RUN apt-get -y install \
+    nginx \
+    python3-dev \
+    build-essential
 
-RUN pip install Flask
+
+
+
+COPY ./requirements.txt ./requirements.txt
+RUN pip install -r requirements.txt
+
+COPY ./main.py ./main.py 
 
 EXPOSE 5000
 
-CMD ["python", "app.py"]
+CMD ["python3", "main.py"]

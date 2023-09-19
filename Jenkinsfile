@@ -1,33 +1,30 @@
 pipeline {
     agent any
-  
+    
     stages {
-        stage('Build and Test') {
+        stage('Clone repository') {
             steps {
-                script {
-                    docker.image('python:3.9').inside {
-                        sh 'pip install Flask'
-                        sh 'python tests.py'
-                    }
-                }
+                git branch: 'master', url: 'https://github.com/cloudboostauk/python-CI-CD-with-Jenkins-and-ArgoCD.git'
             }
         }
-        
-        stage('Dockerize') {
+        stage('Install dependencies') {
             steps {
-                script {
-                    docker.build('hello-world-app')
-                }
+                sh 'pip install -r requirements.txt'
             }
         }
-        
-        stage('Deploy') {
+      
+        stage('Build package') {
             steps {
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
-                        docker.image('hello-world-app').push("${env.BUILD_NUMBER}")
-                    }
-                }
+                sh 'python3 -m venv env'
+                sh '. env/bin/activate'
+                sh 'pip install -U pip'
+                sh 'pip install -r requirements.txt'
+                sh 'python3 setup.py sdist bdist_wheel'
+            }
+        }
+         stage('Deploy') {
+            steps {
+                sh 'python3 main.py'
             }
         }
     }
