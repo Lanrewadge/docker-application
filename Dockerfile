@@ -1,20 +1,17 @@
-FROM python:3.6-slim
+# Use a base image with Python installed
+FROM python:3.9
 
-RUN  apt-get clean && apt-get -y update
+# Set the working directory inside the container
+WORKDIR /app
 
-RUN apt-get -y install \
-    nginx \
-    python3-dev \
-    build-essential
+# Copy the application files into the container
+COPY . .
 
-
-
-
-COPY ./requirements.txt ./requirements.txt
+# Install dependencies
 RUN pip install -r requirements.txt
 
-COPY ./main.py ./main.py 
-
+# Expose the port your application is running on
 EXPOSE 5000
 
-CMD ["python3", "main.py"]
+# Define the command to run your application
+CMD ["python", "app.py"]
