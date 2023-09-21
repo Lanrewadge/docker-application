@@ -1,17 +1,19 @@
-# Use a base image with Python installed
-FROM python:3.9
+# our base image
+FROM alpine:3.5
 
-# Set the working directory inside the container
-WORKDIR /app
+# Install python and pip
+RUN apk add --update py2-pip
 
-# Copy the application files into the container
-COPY . .
+# install Python modules needed by the Python app
+COPY requirements.txt /usr/src/app/
+RUN pip install --no-cache-dir -r /usr/src/app/requirements.txt
 
-# Install dependencies
-RUN pip install -r requirements.txt
+# copy files required for the app to run
+COPY app.py /usr/src/app/
+COPY templates/index.html /usr/src/app/templates/
 
-# Expose the port your application is running on
+# tell the port number the container should expose
 EXPOSE 5000
 
-# Define the command to run your application
-CMD ["python", "app.py"]
+# run the application
+CMD ["python", "/usr/src/app/app.py"]
